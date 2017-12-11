@@ -5,7 +5,7 @@ const config = require('./config')
 const logger = require('./logger')
 const api = require('./api/api')
 
-logger.info('server stating')
+logger.info('server starting')
 
 const app = express()
 app.disable('x-powered-by')
