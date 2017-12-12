@@ -1,5 +1,12 @@
+const prefix = 'SQLBATTLE'
+const get = (name, val) => process.env[`${prefix}_${name}`] || val
+
 module.exports = {
-  port: process.env.SQLBATTLE_PORT || 3000,
-  loglevel: process.env.SQLBATTLE_LOGLEVEL || 'debug',
-  configPath: './config'
+  port: get('PORT', '3000'),
+  loglevel: get('LOGLEVEL', 'debug'),
+  configPath: get('CONFIG_PATH', './config'),
+  dbRootPassword: get('DB_ROOT_PASSWORD', ''),
+  dbPrefix: get('DB_PREFIX', 'sb'),
+  dbHost: get('DB_HOST', '127.0.0.1'),
+  dbPort: get('DB_PORT', '3306')
 }
