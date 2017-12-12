@@ -35,7 +35,7 @@ router.get('/', async (req, res, next) => {
 router.get('/:id', async (req, res, next) => {
   const id = req.params.id
   if (!validateQuizId(id)) {
-    res.json({ error: 'Invalid ID' })
+    res.status(400).json({ error: 'Invalid ID' })
     return
   }
   try {
