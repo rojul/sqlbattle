@@ -1,0 +1,7 @@
+*.md
+*.yml
+.*
+config/
+Dockerfile*
+Makefile
+node_modules/

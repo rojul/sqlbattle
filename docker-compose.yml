@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+
+  web:
+    build: .
+    ports:
+      - 3000:3000
+    environment:
+      - SQLBATTLE_DB_ROOT_PASSWORD=p4ssw0rd
+      - SQLBATTLE_DB_HOST=tmpdb
+    read_only: true
+    volumes:
+      - ./config:/usr/src/app/config
+    restart: unless-stopped
+
+  tmpdb:
+    image: mariadb:10.2
+    ports:
+      - 127.0.0.1:3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=p4ssw0rd
+    tmpfs:
+      - /var/lib/mysql
+    restart: unless-stopped
