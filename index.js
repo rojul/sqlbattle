@@ -4,7 +4,7 @@ const bodyParser = require('body-parser')
 
 const config = require('./config')
 const logger = require('./logger')
-const api = require('./api/api')
+const api = require('./api')
 
 logger.info('server starting')
 
