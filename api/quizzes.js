@@ -16,9 +16,11 @@ const readJson = async id => {
 router.get('/', async (req, res, next) => {
   try {
     const ids = (await fs.readdir(config.configPath))
-      .map(f => f.split('.'))
-      .filter(f => f.length === 2 && f[1] === 'json' && utils.validateId(f[0]))
-      .map(f => f[0])
+      .map(f => {
+        const [id, ...e] = f.split('.')
+        return e.join('.') === 'json' && utils.validateId(id) ? id : undefined
+      })
+      .filter(id => id)
     const promises = ids.map(id => readJson(id))
     const quizzes = (await Promise.all(promises))
       .map(q => ({
