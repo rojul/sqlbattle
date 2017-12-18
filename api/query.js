@@ -63,7 +63,18 @@ const query = async (id, sql) => {
     c.end()
   }
 
-  return result.rows
+  if (!Array.isArray(result.fields[0])) {
+    result.fields = [result.fields]
+    result.rows = [result.rows]
+  }
+
+  result = result.fields.map((fieldsObj, i) => {
+    const fields = fieldsObj.map(f => f.name)
+    const rows = result.rows[i].map(row => fields.map(f => row[f]))
+    return { fields, rows }
+  })
+
+  return { result }
 }
 
 router.post('/', async (req, res, next) => {
