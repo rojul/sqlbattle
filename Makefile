@@ -11,7 +11,7 @@ logs:
 down:
 	docker-compose down
 
-.PHONY: tmpdb-exec
+.PHONY: tmpdb-mysqlcli
 tmpdb-mysqlcli:
 	@docker exec -it sqlbattle_tmpdb_1 sh -c 'mysql -p$$MYSQL_ROOT_PASSWORD'
 
