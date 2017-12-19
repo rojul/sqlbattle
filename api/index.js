@@ -1,12 +1,14 @@
 const express = require('express')
 
 const { version, description } = require('../package.json')
+const logger = require('../logger')
+const databases = require('./databases')
 const query = require('./query')
 const quizzes = require('./quizzes')
-const logger = require('../logger')
 
 const router = express.Router()
 
+router.use('/databases', databases)
 router.use('/query', query)
 router.use('/quizzes', quizzes)
 
