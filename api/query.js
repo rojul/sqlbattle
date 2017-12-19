@@ -1,16 +1,10 @@
 const express = require('express')
-const fs = require('fs-extra')
-const path = require('path')
 
 const db = require('../db')
 const config = require('../config')
 const utils = require('../utils')
 
 const router = express.Router()
-
-const readFile = async id => {
-  return fs.readFile(path.join(config.configPath, `${id}.sql`), 'utf8')
-}
 
 const createUser = async (c, user, database, privileges) => {
   await db.query(c, `CREATE USER IF NOT EXISTS ?@'%' IDENTIFIED BY ?`, [user, config.dbRootPassword])
@@ -24,7 +18,7 @@ const ensureDatabase = async (c, id) => {
     return
   }
 
-  const dump = await readFile(id)
+  const dump = await utils.readSqlFile(id)
   const rwUser = `${config.dbPrefix}_rw_${id}`
   await createUser(c, rwUser, `${config.dbPrefix}\\_${id}`, 'ALL PRIVILEGES')
   await db.query(c, 'CREATE DATABASE ??', database)
