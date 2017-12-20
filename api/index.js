@@ -1,4 +1,5 @@
 const express = require('express')
+const bodyParser = require('body-parser')
 
 const { version, description } = require('../package.json')
 const logger = require('../logger')
@@ -7,6 +8,7 @@ const query = require('./query')
 const quizzes = require('./quizzes')
 
 const router = express.Router()
+router.use(bodyParser.json({ type: '*/*' }))
 
 router.use('/databases', databases)
 router.use('/query', query)
