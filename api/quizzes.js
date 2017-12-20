@@ -29,4 +29,25 @@ router.get('/:id', utils.validateIdMiddleware, async (req, res, next) => {
   }
 })
 
+router.put('/:id', utils.validateIdMiddleware, async (req, res, next) => {
+  const id = req.params.id
+  const { name, db, questions } = req.body
+  try {
+    await utils.writeJson(id, { name, db, questions })
+    res.json({ })
+  } catch (err) {
+    next(err)
+  }
+})
+
+router.delete('/:id', utils.validateIdMiddleware, async (req, res, next) => {
+  const id = req.params.id
+  try {
+    await utils.removeFile(id, 'json')
+    res.json({ })
+  } catch (err) {
+    next(err)
+  }
+})
+
 module.exports = router

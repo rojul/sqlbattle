@@ -29,7 +29,7 @@ exports.writeSqlFile = async (id, data) => {
 }
 
 exports.writeJson = async (id, obj) => {
-  await fs.writeJson(getPath(id, 'json'), obj)
+  await fs.writeJson(getPath(id, 'json'), obj, { spaces: 2 })
 }
 
 exports.removeFile = async (id, ext) => {
