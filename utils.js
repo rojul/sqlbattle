@@ -3,6 +3,8 @@ const path = require('path')
 
 const config = require('./config')
 
+const getPath = (id, ext) => path.join(config.configPath, `${id}.${ext}`)
+
 exports.validateId = id => typeof id === 'string' && /^[a-z0-9]+$/.test(id)
 
 exports.findFilesWithExt = async ext => {
@@ -15,13 +17,24 @@ exports.findFilesWithExt = async ext => {
 }
 
 exports.readSqlFile = async id => {
-  return fs.readFile(path.join(config.configPath, `${id}.sql`), 'utf8')
+  return fs.readFile(getPath(id, 'sql'), 'utf8')
 }
 
 exports.readJson = async id => {
-  const json = await fs.readJson(path.join(config.configPath, `${id}.json`))
-  json.id = id
-  return json
+  return Object.assign({ id }, await fs.readJson(getPath(id, 'json')))
+}
+
+exports.writeSqlFile = async (id, data) => {
+  return fs.writeFile(getPath(id, 'sql'), data)
+}
+
+exports.writeJson = async (id, obj) => {
+  await fs.writeJson(getPath(id, 'json'), obj)
+}
+
+exports.removeFile = async (id, ext) => {
+  await fs.remove(getPath(id, ext))
+}
 
 exports.validateIdMiddleware = (req, res, next) => {
   if (!this.validateId(req.params.id)) {
