@@ -1,4 +1,5 @@
 const express = require('express')
+const assert = require('assert')
 
 const db = require('../db')
 const config = require('../config')
@@ -37,8 +38,8 @@ const ensureDatabase = async (c, id) => {
   await db.query(c, `DROP USER ?@'%'`, rwUser)
 }
 
-const query = async (id, sql) => {
-  let c, result
+const query = async (id, sql, answer) => {
+  let c, result, correct
 
   try {
     c = db.connect('root')
@@ -52,27 +53,43 @@ const query = async (id, sql) => {
       database: `${config.dbPrefix}_${id}`
     })
 
-    result = await db.query(c, sql)
+    result = transformResult(await db.query(c, sql))
+
+    if (answer !== undefined) {
+      const expected = transformResult(await db.query(c, answer))
+      correct = deepEqual(result, expected)
+    }
   } finally {
     c.end()
   }
 
+  return { result, correct }
+}
+
+const transformResult = result => {
   if (!Array.isArray(result.fields[0])) {
     result.fields = [result.fields]
     result.rows = [result.rows]
   }
 
-  result = result.fields.map((fieldsObj, i) => {
+  return result.fields.map((fieldsObj, i) => {
     const fields = fieldsObj.map(f => f.name)
     const rows = result.rows[i].map(row => fields.map(f => row[f]))
     return { fields, rows }
   })
+}
 
-  return { result }
+const deepEqual = (actual, expected) => {
+  try {
+    assert.deepStrictEqual(actual, expected)
+    return true
+  } catch (e) {
+    return false
+  }
 }
 
 router.post('/', async (req, res, next) => {
-  const { db, sql } = req.body
+  const { db, sql, answer } = req.body
   if (!utils.validateId(db)) {
     res.status(400).json({ error: 'Invalid field db' })
     return
@@ -81,9 +98,13 @@ router.post('/', async (req, res, next) => {
     res.status(400).json({ error: 'Invalid field sql' })
     return
   }
+  if (answer !== undefined && typeof answer !== 'string') {
+    res.status(400).json({ error: 'Invalid field answer' })
+    return
+  }
 
   try {
-    const rows = await query(db, sql)
+    const rows = await query(db, sql, answer)
     res.json(rows)
   } catch (err) {
     next(err)
