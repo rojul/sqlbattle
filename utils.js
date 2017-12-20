@@ -22,4 +22,11 @@ exports.readJson = async id => {
   const json = await fs.readJson(path.join(config.configPath, `${id}.json`))
   json.id = id
   return json
+
+exports.validateIdMiddleware = (req, res, next) => {
+  if (!this.validateId(req.params.id)) {
+    res.status(400).json({ error: 'Invalid ID' })
+    return
+  }
+  next()
 }

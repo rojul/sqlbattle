@@ -19,12 +19,8 @@ router.get('/', async (req, res, next) => {
   }
 })
 
-router.get('/:id', async (req, res, next) => {
+router.get('/:id', utils.validateIdMiddleware, async (req, res, next) => {
   const id = req.params.id
-  if (!utils.validateId(id)) {
-    res.status(400).json({ error: 'Invalid ID' })
-    return
-  }
   try {
     const quiz = await utils.readJson(id)
     res.json(quiz)

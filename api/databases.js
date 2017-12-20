@@ -17,12 +17,8 @@ router.get('/', async (req, res, next) => {
   }
 })
 
-router.get('/:id', async (req, res, next) => {
+router.get('/:id', utils.validateIdMiddleware, async (req, res, next) => {
   const id = req.params.id
-  if (!utils.validateId(id)) {
-    res.status(400).json({ error: 'Invalid ID' })
-    return
-  }
   try {
     const sql = await utils.readSqlFile(id)
     res.json({ id, sql })
