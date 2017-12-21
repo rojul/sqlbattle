@@ -12,16 +12,19 @@ const createUser = async (c, user, database, privileges) => {
   await db.query(c, `GRANT ${privileges} ON ??.* TO ?@'%'`, [database.replace(/_/g, '\\_'), user])
 }
 
-const ensureDatabase = async (c, id) => {
+const ensureDatabase = async (c, id, force = false) => {
   const database = `${config.dbPrefix}_${id}`
-  const { rows } = await db.query(c, 'SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ?', database)
-  if (rows.length !== 0) {
-    return
+  if (!force) {
+    const { rows } = await db.query(c, 'SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ?', database)
+    if (rows.length !== 0) {
+      return
+    }
   }
 
   const dump = await utils.readSqlFile(id)
   const rwUser = `${config.dbPrefix}_rw_${id}`
   await createUser(c, rwUser, database, 'ALL PRIVILEGES')
+  await db.query(c, 'DROP DATABASE IF EXISTS ??', database)
   await db.query(c, 'CREATE DATABASE ??', database)
 
   c.changeUser({
