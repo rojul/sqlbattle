@@ -9,7 +9,7 @@ const router = express.Router()
 
 const createUser = async (c, user, database, privileges) => {
   await db.query(c, `CREATE USER IF NOT EXISTS ?@'%' IDENTIFIED BY ?`, [user, config.dbRootPassword])
-  await db.query(c, `GRANT ${privileges} ON ??.* TO ?@'%'`, [database, user])
+  await db.query(c, `GRANT ${privileges} ON ??.* TO ?@'%'`, [database.replace(/_/g, '\\_'), user])
 }
 
 const ensureDatabase = async (c, id) => {
@@ -21,7 +21,7 @@ const ensureDatabase = async (c, id) => {
 
   const dump = await utils.readSqlFile(id)
   const rwUser = `${config.dbPrefix}_rw_${id}`
-  await createUser(c, rwUser, `${config.dbPrefix}\\_${id}`, 'ALL PRIVILEGES')
+  await createUser(c, rwUser, database, 'ALL PRIVILEGES')
   await db.query(c, 'CREATE DATABASE ??', database)
 
   c.changeUser({
@@ -43,14 +43,15 @@ const query = async (id, sql, answer) => {
 
   try {
     c = db.connect('root')
-    const roUser = `${config.dbPrefix}_ro`
+    const roUser = `${config.dbPrefix}_ro_${id}`
+    const database = `${config.dbPrefix}_${id}`
 
     await ensureDatabase(c, id)
-    await createUser(c, roUser, `${config.dbPrefix}\\_%`, 'SELECT, SHOW VIEW')
+    await createUser(c, roUser, database, 'SELECT, SHOW VIEW')
 
     c.changeUser({
       user: roUser,
-      database: `${config.dbPrefix}_${id}`
+      database
     })
 
     result = transformResult(await db.query(c, sql))
