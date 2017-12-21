@@ -1,9 +1,10 @@
 const express = require('express')
 const assert = require('assert')
 
-const db = require('../db')
-const config = require('../config')
-const utils = require('../utils')
+const config = require('../lib/config')
+const db = require('../lib/db')
+const files = require('../lib/files')
+const utils = require('../lib/utils')
 
 const router = express.Router()
 
@@ -21,7 +22,7 @@ const ensureDatabase = async (c, id, force = false) => {
     }
   }
 
-  const dump = await utils.readSqlFile(id)
+  const dump = await files.readSqlFile(id)
   const rwUser = `${config.dbPrefix}_rw_${id}`
   await createUser(c, rwUser, database, 'ALL PRIVILEGES')
   await db.query(c, 'DROP DATABASE IF EXISTS ??', database)

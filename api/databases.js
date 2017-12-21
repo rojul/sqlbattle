@@ -1,12 +1,13 @@
 const express = require('express')
 
-const utils = require('../utils')
+const files = require('../lib/files')
+const middleware = require('../lib/middleware')
 
 const router = express.Router()
 
 router.get('/', async (req, res, next) => {
   try {
-    const ids = await utils.findFilesWithExt('sql')
+    const ids = await files.findFilesWithExt('sql')
     const databases = ids.map(id => ({ id }))
     res.json({ databases })
   } catch (err) {
@@ -14,17 +15,17 @@ router.get('/', async (req, res, next) => {
   }
 })
 
-router.get('/:id', utils.validateIdMiddleware, async (req, res, next) => {
+router.get('/:id', middleware.validateId, async (req, res, next) => {
   const id = req.params.id
   try {
-    const sql = await utils.readSqlFile(id)
+    const sql = await files.readSqlFile(id)
     res.json({ id, sql })
   } catch (err) {
     next(err)
   }
 })
 
-router.put('/:id', utils.validateIdMiddleware, async (req, res, next) => {
+router.put('/:id', middleware.validateId, async (req, res, next) => {
   const id = req.params.id
   const sql = req.body.sql
   if (typeof sql !== 'string') {
@@ -32,17 +33,17 @@ router.put('/:id', utils.validateIdMiddleware, async (req, res, next) => {
     return
   }
   try {
-    await utils.writeSqlFile(id, sql)
+    await files.writeSqlFile(id, sql)
     res.json({ })
   } catch (err) {
     next(err)
   }
 })
 
-router.delete('/:id', utils.validateIdMiddleware, async (req, res, next) => {
+router.delete('/:id', middleware.validateId, async (req, res, next) => {
   const id = req.params.id
   try {
-    await utils.removeFile(id, 'sql')
+    await files.removeFile(id, 'sql')
     res.json({ })
   } catch (err) {
     next(err)

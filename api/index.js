@@ -2,7 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 
 const { version, description } = require('../package.json')
-const logger = require('../logger')
+const logger = require('../lib/logger')
 const databases = require('./databases')
 const query = require('./query')
 const quizzes = require('./quizzes')

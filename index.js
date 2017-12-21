@@ -1,8 +1,8 @@
 const express = require('express')
 const compression = require('compression')
 
-const config = require('./config')
-const logger = require('./logger')
+const config = require('./lib/config')
+const logger = require('./lib/logger')
 const api = require('./api')
 
 logger.info('server starting')
