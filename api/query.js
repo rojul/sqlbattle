@@ -2,45 +2,11 @@ const express = require('express')
 const assert = require('assert')
 
 const config = require('../lib/config')
+const dbUtils = require('../lib/db-utils')
 const db = require('../lib/db')
-const files = require('../lib/files')
 const utils = require('../lib/utils')
 
 const router = express.Router()
-
-const createUser = async (c, user, database, privileges) => {
-  await db.query(c, `CREATE USER IF NOT EXISTS ?@'%' IDENTIFIED BY ?`, [user, config.dbRootPassword])
-  await db.query(c, `GRANT ${privileges} ON ??.* TO ?@'%'`, [database.replace(/_/g, '\\_'), user])
-}
-
-const ensureDatabase = async (c, id, force = false) => {
-  const database = `${config.dbPrefix}_${id}`
-  if (!force) {
-    const { rows } = await db.query(c, 'SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = ?', database)
-    if (rows.length !== 0) {
-      return
-    }
-  }
-
-  const dump = await files.readSqlFile(id)
-  const rwUser = `${config.dbPrefix}_rw_${id}`
-  await createUser(c, rwUser, database, 'ALL PRIVILEGES')
-  await db.query(c, 'DROP DATABASE IF EXISTS ??', database)
-  await db.query(c, 'CREATE DATABASE ??', database)
-
-  c.changeUser({
-    user: rwUser,
-    database
-  })
-
-  await db.query(c, dump)
-
-  c.changeUser({
-    user: 'root'
-  })
-
-  await db.query(c, `DROP USER ?@'%'`, rwUser)
-}
 
 const query = async (id, sql, answer) => {
   let c, result, correct
@@ -50,8 +16,8 @@ const query = async (id, sql, answer) => {
     const roUser = `${config.dbPrefix}_ro_${id}`
     const database = `${config.dbPrefix}_${id}`
 
-    await ensureDatabase(c, id)
-    await createUser(c, roUser, database, 'SELECT, SHOW VIEW')
+    await dbUtils.ensureDatabase(c, id)
+    await dbUtils.createUser(c, roUser, database, 'SELECT, SHOW VIEW')
 
     c.changeUser({
       user: roUser,

@@ -1,5 +1,7 @@
 const express = require('express')
 
+const db = require('../lib/db')
+const dbUtils = require('../lib/db-utils')
 const files = require('../lib/files')
 const middleware = require('../lib/middleware')
 
@@ -34,11 +36,27 @@ router.put('/:id', middleware.validateId, async (req, res, next) => {
   }
   try {
     await files.writeSqlFile(id, sql)
-    res.json({ })
+    res.json(await forceImport(id))
   } catch (err) {
     next(err)
   }
 })
+
+const forceImport = async id => {
+  let c
+  try {
+    c = db.connect('root')
+    await dbUtils.ensureDatabase(c, id, true)
+  } catch (e) {
+    return {
+      importSuccessful: false,
+      error: e.sqlMessage || e.message
+    }
+  } finally {
+    c.end()
+  }
+  return { importSuccessful: true }
+}
 
 router.delete('/:id', middleware.validateId, async (req, res, next) => {
   const id = req.params.id
