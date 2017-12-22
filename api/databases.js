@@ -43,19 +43,15 @@ router.put('/:id', middleware.validateId, async (req, res, next) => {
 })
 
 const forceImport = async id => {
-  let c
+  let c, error
   try {
     c = db.connect('root')
     await dbUtils.ensureDatabase(c, id, true)
-  } catch (e) {
-    return {
-      importSuccessful: false,
-      error: e.sqlMessage || e.message
-    }
-  } finally {
-    c.end()
+  } catch (err) {
+    error = err.sqlMessage || err.message
   }
-  return { importSuccessful: true }
+  c.end()
+  return { importSuccessful: !error, error }
 }
 
 router.delete('/:id', middleware.validateId, async (req, res, next) => {
