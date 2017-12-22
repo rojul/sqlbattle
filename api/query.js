@@ -18,12 +18,7 @@ const query = async (id, sql, answer) => {
 
     await dbUtils.ensureDatabase(c, id)
     await dbUtils.createUser(c, roUser, database, 'SELECT, SHOW VIEW')
-
-    c.changeUser({
-      user: roUser,
-      database
-    })
-
+    c.changeUser({ user: roUser, database })
     result = transformResult(await db.query(c, sql))
 
     if (answer !== undefined) {
