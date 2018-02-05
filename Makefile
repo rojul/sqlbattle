@@ -18,3 +18,7 @@ tmpdb-mysqlcli:
 .PHONY: tmpdb-restart
 tmpdb-restart:
 	@docker-compose restart tmpdb
+
+.PHONY: tmpdb-start
+tmpdb-start:
+	@docker-compose up -d tmpdb

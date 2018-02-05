@@ -5,3 +5,4 @@ config/
 Dockerfile*
 Makefile
 node_modules/
+.env
