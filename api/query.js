@@ -19,10 +19,10 @@ const query = async (id, sql, answer) => {
     await dbUtils.ensureDatabase(c, id)
     await dbUtils.createUser(c, roUser, database, 'SELECT, SHOW VIEW')
     c.changeUser({ user: roUser, database })
-    result = transformResult(await db.query(c, sql))
+    result = transformResult(await db.query(c, { sql, rowsAsArray: true }))
 
     if (answer !== undefined) {
-      const expected = transformResult(await db.query(c, answer))
+      const expected = transformResult(await db.query(c, { sql: answer, rowsAsArray: true }))
       correct = deepEqual(result, expected)
     }
   } finally {
@@ -32,17 +32,11 @@ const query = async (id, sql, answer) => {
   return { result, correct }
 }
 
-const transformResult = result => {
-  if (!Array.isArray(result.fields[0])) {
-    result.fields = [result.fields]
-    result.rows = [result.rows]
+const transformResult = ({ fields, rows }) => {
+  return {
+    fields: fields.map(f => f.name),
+    rows
   }
-
-  return result.fields.map((fieldsObj, i) => {
-    const fields = fieldsObj.map(f => f.name)
-    const rows = result.rows[i].map(row => fields.map(f => row[f]))
-    return { fields, rows }
-  })
 }
 
 const deepEqual = (actual, expected) => {
