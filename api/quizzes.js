@@ -1,4 +1,5 @@
 const express = require('express')
+const Joi = require('joi')
 
 const files = require('../lib/files')
 const middleware = require('../lib/middleware')
@@ -32,9 +33,9 @@ router.get('/:id', middleware.validateId, async (req, res, next) => {
 
 router.put('/:id', middleware.validateId, async (req, res, next) => {
   const id = req.params.id
-  const { name, db, questions } = req.body
   try {
-    await files.writeJson(id, { name, db, questions })
+    const obj = await Joi.validate(req.body, quizSchema)
+    await files.writeJson(id, obj)
     res.json({ })
   } catch (err) {
     next(err)
@@ -50,5 +51,15 @@ router.delete('/:id', middleware.validateId, async (req, res, next) => {
     next(err)
   }
 })
+
+const quizSchema = Joi.object({
+  name: Joi.string().required(),
+  db: Joi.string().required(),
+  questions: Joi.array().items(Joi.object({
+    question: Joi.string().required(),
+    answer: Joi.string().required(),
+    help: Joi.string(),
+  }).required()).min(1).required()
+}).required()
 
 module.exports = router
