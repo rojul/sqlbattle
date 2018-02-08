@@ -1,0 +1,38 @@
+{
+  "name": "Fußball Wettbewerb",
+  "db": "fussball",
+  "questions": [{
+    "question": "Ermitteln Sie alle Spieler, die mindestens eine Strafe erhalten haben",
+    "answer": "SELECT * FROM spieler WHERE SpielerID IN (SELECT SpielerID FROM strafe);"
+  }, {
+    "question": "Ermitteln Sie den Namen des Spielers, der am ältesten ist.",
+    "answer": "SELECT Vorname, Nachname FROM spieler WHERE Geburtsdatum IN (SELECT min(Geburtsdatum) FROM spieler);"
+  }, {
+    "question": "Zeigen Sie alle Spieler an, die mindestens ein Tor erzielt haben.",
+    "answer": "SELECT * FROM spieler WHERE SpielerID IN (SELECT SpielerID FROM tor);"
+  }, {
+    "question": "Ermitteln Sie alle Spieler, die keine Strafe erhalten haben",
+    "answer": "SELECT * FROM spieler WHERE SpielerID NOT IN (SELECT SpielerID FROM strafe);"
+  }, {
+    "question": "Geben Sie die Namen aller Teams, die an mindestens einem Spiel teilgenommen haben.",
+    "answer": "SELECT Bezeichnung FROM team WHERE TeamID IN (SELECT TeamGastID FROM zuordnung) OR TeamID IN (SELECT TeamHeimID FROM zuordnung);"
+  }, {
+    "question": "Zeigen Sie die Spieler an, die mehr als 2 Tore geschossen haben.",
+    "answer": "SELECT * FROM spieler WHERE SpielerID IN (SELECT SpielerID FROM tor GROUP BY SpielerID HAVING count(*) > 2);"
+  }, {
+    "question": "Zeigen Sie die Anzahl der Tore je Team an. Die Angabe der TeamNr langt. (Diese Aufgabe ist ohne Subselect zu lösen)",
+    "answer": "SELECT TeamID, count(*) FROM tor GROUP BY TeamID;"
+  }, {
+    "question": "In welchem Team wurden Spielern noch keine Strafen ausgestellt?",
+    "answer": "SELECT * FROM team WHERE TeamID NOT IN (SELECT TeamID FROM spieler WHERE SpielerID IN (SELECT SpielerID FROM strafe));"
+  }, {
+    "question": "Welcher Spieler hat bislang die höchste Strafe erhalten? ",
+    "answer": "SELECT * FROM spieler WHERE SpielerID = (SELECT SpielerID FROM strafe WHERE Hoehe = (SELECT max(Hoehe) FROM strafe));"
+  }, {
+    "question": "Zeigen Sie alle Teams an, die schon einmal gegen den FCB gespielt haben. Nutzen Sie hierzu die Team_IDs.",
+    "answer": "SELECT * FROM team WHERE TeamID IN (SELECT TeamGastID FROM zuordnung WHERE TeamHeimID IN (SELECT TeamID FROM team WHERE Bezeichnung = 'FCB')) OR TeamID IN (SELECT TeamHeimID FROM zuordnung WHERE TeamGastID IN (SELECT TeamID FROM team WHERE Bezeichnung = 'FCB'));"
+  }, {
+    "question": "Zeigen Sie alle Spieler an, die eine überdurchschnittlich hohe  Strafe bislang erzielt haben.",
+    "answer": "SELECT * FROM spieler WHERE SpielerID IN (SELECT SpielerID FROM strafe WHERE Hoehe > (SELECT avg(Hoehe) FROM strafe));"
+  }]
+}
