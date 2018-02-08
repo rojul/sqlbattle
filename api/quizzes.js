@@ -58,7 +58,7 @@ const quizSchema = Joi.object({
   questions: Joi.array().items(Joi.object({
     question: Joi.string().required(),
     answer: Joi.string().required(),
-    help: Joi.string(),
+    help: Joi.string()
   }).required()).min(1).required()
 }).required()
 

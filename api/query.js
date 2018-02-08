@@ -22,7 +22,12 @@ const query = async (id, sql, answer) => {
     result = transformResult(await db.query(c, sql))
 
     if (answer !== undefined) {
-      const expected = transformResult(await db.query(c, answer))
+      let expected
+      try {
+        expected = transformResult(await db.query(c, answer))
+      } catch (e) {
+        throw new Error(`Error while running the answer sql query: ${e}`)
+      }
       correct = deepEqual(result, expected)
     }
   } finally {
