@@ -58,10 +58,21 @@ router.delete('/:id', middleware.validateId, async (req, res, next) => {
   const id = req.params.id
   try {
     await files.removeFile(id, 'sql')
+    await deleteDatabase(id)
     res.json({ })
   } catch (err) {
     next(err)
   }
 })
+
+const deleteDatabase = async (id) => {
+  let c
+  try {
+    c = db.connect('root')
+    await dbUtils.dropDatabase(c, id)
+  } finally {
+    c.end()
+  }
+}
 
 module.exports = router
