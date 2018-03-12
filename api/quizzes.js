@@ -31,7 +31,7 @@ router.get('/:id', middleware.validateId, async (req, res, next) => {
   }
 })
 
-router.put('/:id', middleware.validateId, async (req, res, next) => {
+router.put('/:id', middleware.checkToken, middleware.validateId, async (req, res, next) => {
   const id = req.params.id
   try {
     const obj = await Joi.validate(req.body, quizSchema)
@@ -42,7 +42,7 @@ router.put('/:id', middleware.validateId, async (req, res, next) => {
   }
 })
 
-router.delete('/:id', middleware.validateId, async (req, res, next) => {
+router.delete('/:id', middleware.checkToken, middleware.validateId, async (req, res, next) => {
   const id = req.params.id
   try {
     await files.removeFile(id, 'json')

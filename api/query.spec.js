@@ -56,7 +56,7 @@ describe('query', function () {
   it('invalid sql', async function () {
     const res = await request.post('/api/query').send({
       db: 'fussball',
-      sql: 'bla',
+      sql: 'bla'
     })
     expect(res.body).deep.equal({
       error: `You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'bla' at line 1`

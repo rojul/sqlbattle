@@ -3,6 +3,7 @@ const bodyParser = require('body-parser')
 
 const { version, description } = require('../package.json')
 const logger = require('../lib/logger')
+const middleware = require('../lib/middleware')
 const clean = require('./clean')
 const databases = require('./databases')
 const query = require('./query')
@@ -18,6 +19,10 @@ router.use('/quizzes', quizzes)
 
 router.get('/', (req, res, next) => {
   res.json({ version, description })
+})
+
+router.post('/check-token', middleware.checkToken, (req, res, next) => {
+  res.json({ ok: true })
 })
 
 router.all('*', (req, res) => {

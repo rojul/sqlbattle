@@ -3,10 +3,11 @@ const express = require('express')
 const config = require('../lib/config')
 const db = require('../lib/db')
 const utils = require('../lib/utils')
+const middleware = require('../lib/middleware')
 
 const router = express.Router()
 
-router.post('/', async (req, res, next) => {
+router.post('/', middleware.checkToken, async (req, res, next) => {
   try {
     await clean()
     res.json({ })
