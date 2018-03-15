@@ -30,6 +30,7 @@ This project is configured with environment variables:
 | SQLBATTLE_DB_PREFIX        | sb        |
 | SQLBATTLE_DB_HOST          | 127.0.0.1 |
 | SQLBATTLE_DB_PORT          | 3306      |
+| SQLBATTLE_DB_SOCKET_PATH   |           |
 | SQLBATTLE_CONFIG_TOKEN     |           |
 
 Set env on Linux/Mac:
